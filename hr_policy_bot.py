@@ -25,7 +25,7 @@ def generate(question):
     chunks = splitter.split_documents(data)
     vector_store = FAISS.from_documents(chunks, embeddings)
 
-    llm = ChatOpenAI(model="gpt-4o", temperature=0, max_tokens = None, timeout = None, api_key = os.getenv("OPENAI_API_KEY"))
+    llm = ChatOpenAI(model="gpt-4o", temperature=0, max_tokens = None, timeout = None, api_key = st.secrets["OPENAI_API_KEY"])
     retriever = vector_store.as_retriever(search_kwargs={'k':4})
     qa_chain = ConversationalRetrievalChain.from_llm(llm = llm, retriever = retriever)
 
