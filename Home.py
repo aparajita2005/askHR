@@ -24,7 +24,7 @@ st.markdown(
 )
 st.logo("logo.png", size='large', icon_image=None)
 # st.sidebar.image("logo.png")
-st.set_page_config("HR Chat Bot", layout='wide' )
+st.set_page_config("askHR", layout='wide' )
 
 st.title("askHR")
 st.write("*:grey[Your Digital HR Partner for Professional Support]*")
