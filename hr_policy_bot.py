@@ -9,6 +9,7 @@ from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
 from docx import Document
 import docx2txt
+import streamlit as st
 
 
 def read_docx(file_path):
