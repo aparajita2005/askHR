@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv, dotenv_values
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain_community.embeddings.openai import OpenAIEmbeddings
@@ -7,9 +6,8 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
-from docx import Document
 import docx2txt
-import streamlit as st
+from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 
 def read_docx(file_path):
@@ -26,10 +24,25 @@ def generate(question):
     chunks = splitter.split_documents(data)
     vector_store = FAISS.from_documents(chunks, embeddings)
 
-    llm = ChatOpenAI(model="gpt-4o", temperature=0, max_tokens = None, timeout = None, api_key = st.secrets["OPENAI_API_KEY"])
-    retriever = vector_store.as_retriever(search_kwargs={'k':4})
-    qa_chain = ConversationalRetrievalChain.from_llm(llm = llm, retriever = retriever)
+    general_system_template = r""" 
+    You are an HR assistant for the company pAI. Use the context to answer the question. Be as specific as possible. If the answer is not found within the sources, say that you are not sure. Do not make up any answer.
+    Try to answer the questions in list format, if possible. Otherwise, just answer normally.
+    ----
+    {context}
+    ----
+    """
+    general_user_template = "Question:```{question}```"
+    messages = [
+                SystemMessagePromptTemplate.from_template(general_system_template),
+                HumanMessagePromptTemplate.from_template(general_user_template)
+    ]
+    qa_prompt = ChatPromptTemplate.from_messages( messages )
 
+    llm = ChatOpenAI(model="gpt-4o", temperature=0, max_tokens = None, timeout = None, api_key = os.getenv("OPENAI_API_KEY"))
+    retriever = vector_store.as_retriever(search_kwargs={'k':4})
+    qa_chain = ConversationalRetrievalChain.from_llm(llm = llm, retriever = retriever, combine_docs_chain_kwargs={'prompt': qa_prompt})
+
+    
     def find_source(question):
         relevant_docs = vector_store.similarity_search(question, k = 4)
         src = []
@@ -40,14 +53,16 @@ def generate(question):
             src.append(res)
         return src
 
+    def faq():
+        chain = RetrievalQA.from_llm(llm=llm, retriever=retriever)
+        qn = "Give a list of example questions I can ask you"
+        return chain.run(qn)
+
+    context = find_source(question)
     chat_history = []
     #Giving a response
     response = qa_chain({'question':question, 'chat_history':chat_history})
     history = (response['question'], response['answer'])
     chat_history.append(history)
-    return [response['answer'], find_source(question)]
+    return [response['answer'], find_source(question), faq()]
 
-# ques = "What is the dress code"
-# print(generate(ques)[1])
-
-print(read_docx("./hr_docs/Dress Code Policy.docx"))
