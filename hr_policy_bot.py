@@ -25,9 +25,10 @@ def generate(question):
     vector_store = FAISS.from_documents(chunks, embeddings)
 
     general_system_template = r""" 
-    You are an HR assistant for the company pAI. Use the context to answer the question. Be as specific as possible. If the answer is not found within the sources, say that you are not sure. Do not make up any answer.
+    You are an HR assistant for the company pAI. Use the context and chat_history to answer the question. Be as specific and detailed as possible.
     Try to answer the questions in list format, if possible. Otherwise, just answer normally.
     ----
+    {chat_history}
     {context}
     ----
     """
