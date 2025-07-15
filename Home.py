@@ -33,6 +33,7 @@ def main_chat(uid=None, questions=None, answers=None, sources=None):
     if "messages" not in st.session_state:
         st.session_state['messages'] = []
         with st.chat_message("assistant"):
+            st.markdown("Here are a few suggested questions you can ask:")
             st.markdown(generate("What is the dress code")[2]) #using a dummy question to invoke the faq method
 
     if "sources" not in st.session_state:
