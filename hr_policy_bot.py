@@ -55,7 +55,7 @@ def generate(question):
 
     def faq():
         chain = RetrievalQA.from_llm(llm=llm, retriever=retriever)
-        qn = "Give a list of example questions I can ask you. Do not say certainly."
+        qn = "Give a list of example questions I can ask you. Do not say anything else."
         return chain.run(qn)
 
     context = find_source(question)
