@@ -117,7 +117,7 @@ Based on the provided context and pAI policies, provide a comprehensive, well-or
 
     def faq():
         chain = RetrievalQA.from_llm(llm=llm, retriever=retriever)
-        qn = "Give a list of example questions I can ask you. Do not say anything else."
+        qn = "Give a list of example questions I can ask you. Simply list the questions. Don't say anything else."
         return chain.run(qn)
 
     context = find_source(question)
@@ -127,4 +127,3 @@ Based on the provided context and pAI policies, provide a comprehensive, well-or
     history = (response['question'], response['answer'])
     chat_history.append(history)
     return [response['answer'], find_source(question), faq()]
-
