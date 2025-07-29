@@ -4,9 +4,12 @@ import uuid
 import os
 from supabase import create_client, Client
 from datetime import datetime
+from dotenv import load_dotenv
 
-url= os.environ.get("SUPABASE_URL")
-key= os.environ.get("SUPABASE_KEY")
+load_dotenv()
+
+url= os.getenv("SUPABASE_URL")
+key= os.getenv("SUPABASE_KEY")
 supabase= create_client(url, key)
 
 def main_chat(uid=None, questions=None, answers=None, sources=None):
@@ -32,9 +35,15 @@ def main_chat(uid=None, questions=None, answers=None, sources=None):
     
     if "messages" not in st.session_state:
         st.session_state['messages'] = []
+        opening_msg = "Hi there! I’m your HR Assistant, here to help you with any questions about our HR policies and procedures. All official policy documents are linked in the sidebar for easy reference. To get you started, I’ll list a few suggested questions you can try."
         with st.chat_message("assistant"):
-            st.markdown("Here are a few suggested questions you can ask:")
-            st.markdown(generate("What is the dress code")[2]) #using a dummy question to invoke the faq method
+            st.markdown(opening_msg)
+        with st.spinner("Generating suggestions..."):
+            suggestions = generate("What is the dress code")[2] #using a dummy question
+        with st.chat_message("assistant"):
+            st.markdown(suggestions)
+
+    
 
     if "sources" not in st.session_state:
         st.session_state['sources'] = []
@@ -158,3 +167,4 @@ if __name__ == "__main__":
         create_chat(st.session_state.uid)
     else:
         main_chat()
+        
