@@ -42,6 +42,8 @@ def main_chat(uid=None, questions=None, answers=None, sources=None):
             suggestions = generate("What is the dress code")[2] #using a dummy question
         with st.chat_message("assistant"):
             st.markdown(suggestions)
+        st.session_state.messages.append({"role": "assistant", "content": opening_msg})
+        st.session_state.messages.append({"role": "assistant", "content": suggestions})
 
     
 
@@ -55,7 +57,7 @@ def main_chat(uid=None, questions=None, answers=None, sources=None):
             st.markdown(message["content"])
         i = i+1
         k = 0
-        if i==3:
+        if i==5:
             for src in st.session_state.sources:
                 if (k==j):
                     with st.expander("View sources"):
